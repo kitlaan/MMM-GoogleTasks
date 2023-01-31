@@ -78,6 +78,7 @@ module.exports = NodeHelper.create({
 	    let nextPageToken = res.data.nextPageToken;
 	    listItems = listItems.concat(res.data.items);
 	    if (nextPageToken){
+		// Continue to fetch the next page as long as the Google API says there is one
 		self.buildList(config, listItems, nextPageToken);
 	    } else {
 		var payload = {id: config.listID, items: listItems};
@@ -94,6 +95,7 @@ module.exports = NodeHelper.create({
         var self = this;
 	var pageToken;
 	var listItems = [];
+	// Going to recursively build the listItems
 	self.buildList(config, listItems, pageToken);
     },
 });
