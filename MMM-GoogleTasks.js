@@ -3,7 +3,7 @@ Module.register("MMM-GoogleTasks", {
 	defaults: {
 
 		listID: "", // List ID (see authenticate.js)
-		maxResults: 10,		
+		taskCount: 10,		
 		dateFormat: "MMM Do", 	// Format to display dates (moment.js formats)
 		updateInterval: 100000, // Time between content updates (millisconds)
 		animationSpeed: 2000, 	// Speed of the update animation (milliseconds)
@@ -193,14 +193,13 @@ Module.register("MMM-GoogleTasks", {
 		groupSubTasks = this.config.groupSubTasks;
 
 	        for (i = 0; i < taskList.length; i++) {
-
         		// if groupsubtasks is true, and it doesn't have parents, display outerloop
             		// if groupsubtasks is false, regardless, display outerloop
             		// otherwise, don't display outer loop, means we're grouping by subtask and this one has parents (is child)
             		// ignore items that have parents; they'll get displayed in the subloop underneath their parents.
 
             		if (!groupSubTasks || (!taskList[i].parent && groupSubTasks)) {
-                		task_count++;
+				task_count++;
                 		// Display the top level tasks
 
 				item = taskList[i];
@@ -277,9 +276,13 @@ Module.register("MMM-GoogleTasks", {
 
 	                	                wrapper.appendChild(titleWrapper);
         		                        wrapper.appendChild(dateWrapper);
+
+						if (++task_count >= this.config.taskCount){ break; }
                     			}
                 		}
+				if (task_count >= this.config.taskCount){ break; }
             		}
+			
         	}
 
 		return wrapper;

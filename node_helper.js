@@ -60,41 +60,40 @@ module.exports = NodeHelper.create({
         self.sendSocketNotification("SERVICE_READY", {});
     },
 
-    getList: function(config) {
-        var self = this;
+    buildList: function(config, listItems, pageToken){
+	var self = this;
 
         if(!self.service) {
             console.log("Refresh required"); 
             return;
         }
 
-        self.service.tasks.list({
-            tasklist: config.listID,
-            maxResults: config.maxResults,
-            showCompleted: config.showCompleted,
-            showHidden: config.showHidden,
-        }, (err, res) => {
-            if (err) {
+	self.service.tasks.list({
+	    tasklist: config.listID,
+	    maxResults: 100, // number of maxResults per page on API results - going max here
+	    showCompleted: false, // Google API default is true
+	    showHidden: false, // Google API default is true
+	    pageToken: pageToken,
+	}).then(res => {
+	    let nextPageToken = res.data.nextPageToken;
+	    listItems = listItems.concat(res.data.items);
+	    if (nextPageToken){
+		self.buildList(config, listItems, nextPageToken);
+	    } else {
+		var payload = {id: config.listID, items: listItems};
+		self.sendSocketNotification("UPDATE_DATA", payload);
+	    }
+	}).catch(err => {
 		var payload = {code: err.code, message: err.message, details: err.details};
 		self.sendSocketNotification("TASKS_API_ERROR", payload);
-	 	return console.error('The API returned an error: ' + err);
-	    }
+		return console.error('The API returned an error: ' + err);
+	});
+    },
 
-            // Testing
-            /* 
-            const tasksList = res.data.items;
-            console.log(tasksList);
-            if (tasksList) {
-                tasksList.forEach((task) => {
-                    console.log(task);
-                });
-            } else {
-                console.log('No tasks found.');
-            }
-             */
-
-            var payload = {id: config.listID, items: res.data.items};
-            self.sendSocketNotification("UPDATE_DATA", payload);
-        });
+    getList: function(config) {
+        var self = this;
+	var pageToken;
+	var listItems = [];
+	self.buildList(config, listItems, pageToken);
     },
 });
