@@ -61,7 +61,7 @@ module.exports = NodeHelper.create({
     },
 
     buildList: function(config, listItems, pageToken){
-	var self = this;
+	let self = this;
 
         if(!self.service) {
             console.log("Refresh required"); 
@@ -81,20 +81,20 @@ module.exports = NodeHelper.create({
 		// Continue to fetch the next page as long as the Google API says there is one
 		self.buildList(config, listItems, nextPageToken);
 	    } else {
-		var payload = {id: config.listID, items: listItems};
+		let payload = {id: config.listID, items: listItems};
 		self.sendSocketNotification("UPDATE_DATA", payload);
 	    }
 	}).catch(err => {
-		var payload = {code: err.code, message: err.message, details: err.details};
+		let payload = {code: err.code, message: err.message, details: err.details};
 		self.sendSocketNotification("TASKS_API_ERROR", payload);
 		return console.error('The API returned an error: ' + err);
 	});
     },
 
     getList: function(config) {
-        var self = this;
-	var pageToken;
-	var listItems = [];
+        let self = this;
+	let pageToken;
+	let listItems = [];
 	// Going to recursively build the listItems
 	self.buildList(config, listItems, pageToken);
     },
