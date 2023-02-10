@@ -199,7 +199,6 @@ Module.register("MMM-GoogleTasks", {
             		// ignore items that have parents; they'll get displayed in the subloop underneath their parents.
 
             		if (!groupSubTasks || (!taskList[i].parent && groupSubTasks)) {
-				task_count++;
                 		// Display the top level tasks
 
 				item = taskList[i];
@@ -234,6 +233,8 @@ Module.register("MMM-GoogleTasks", {
 
                         	wrapper.appendChild(titleWrapper);
                         	wrapper.appendChild(dateWrapper);
+				
+				if (++task_count >= this.config.taskCount){ break; }
 
                 		// Display subtasks under this task; they will be internally also sorted according to the overall sort order
                 		// This mechanism works because there can be only one level of subtasks within Google Tasks
@@ -280,9 +281,7 @@ Module.register("MMM-GoogleTasks", {
 						if (++task_count >= this.config.taskCount){ break; }
                     			}
                 		}
-				if (task_count >= this.config.taskCount){ break; }
             		}
-			
         	}
 
 		return wrapper;
