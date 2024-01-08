@@ -1,7 +1,6 @@
 Module.register("MMM-GoogleTasks", {
 	// Default module config.
 	defaults: {
-
 		listID: "", // List ID (see authenticate.js)
 		taskCount: 10,		
 		dateFormat: "MMM Do", 	// Format to display dates (moment.js formats)
@@ -11,7 +10,8 @@ Module.register("MMM-GoogleTasks", {
 		sortOrder: "ascending", // [ascending, descending]
 		sortBy: "due", 		// [due, updated, default, title]
 		groupSubTasks: true, 	// [true, false]
-		taskIcon: "bx:square-rounded", // something from the iconify icon set		
+		taskIcon: "bx:square-rounded", // something from the iconify icon set
+		maxFutureDueDays: 10,	// Show due items within this number of days
 	},
 	
 	// Define required scripts
@@ -202,6 +202,16 @@ Module.register("MMM-GoogleTasks", {
                 		// Display the top level tasks
 
 				item = taskList[i];
+
+				// Figure out how far this is due (to ignore it)
+				if (item.due) {
+					var future = moment().add(this.config.maxFutureDueDays, 'day');
+					var date = moment(item.due);
+					if (date.isAfter(future)) {
+						continue;
+					}
+				}
+
                         	titleWrapper = document.createElement('div');
                         	titleWrapper.className = "item title";
 				titleWrapper.innerHTML = icon1 + task_icon + icon2 + item.title;
